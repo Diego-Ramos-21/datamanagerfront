@@ -7,7 +7,7 @@ import { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb'
 import React, { ChangeEvent } from 'react';
 import api from './Api'
-import { MenuItem, Paper, Select, SelectChangeEvent, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextField } from '@mui/material';
+import { MenuItem, Paper, Select, SelectChangeEvent, Table, TableBody, TableCell, TableContainer, TableRow, TextField } from '@mui/material';
 import { TailSpin } from 'react-loading-icons'
 import axios, { AxiosError } from 'axios';
 
@@ -29,7 +29,6 @@ function App() {
   const handlerSend = async () => {
     setLoading(true)
     try {
-      console.log(consoleRows)
       // Validation
       if (!date){
         setConsoleRows([{text: ">> O Campo 'Data inicial' é obrigatório!", type: 'e'}, ...consoleRows])
@@ -140,7 +139,6 @@ function App() {
           >
             Enviar {loading && <TailSpin width={15} height={15} style={{margin: '0 4px'}} />}
           </button>
-          {/* <div id='infoLabel'>{newDate ? (<p>{`Data calculada: ${newDate}`}</p>) : (errorMsg ? <p className='error'>{errorMsg}</p> : null)}</div> */}
         </div>
         <div className='history'>
           <h3 style={{textAlign: 'left'}}>Console</h3>
