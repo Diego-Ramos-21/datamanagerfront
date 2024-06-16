@@ -7,41 +7,45 @@ import { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb'
 import React, { ChangeEvent } from 'react';
 import api from './Api'
-import { MenuItem, Select, SelectChangeEvent, TextField } from '@mui/material';
+import { MenuItem, Paper, Select, SelectChangeEvent, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextField } from '@mui/material';
 import { TailSpin } from 'react-loading-icons'
 import axios, { AxiosError } from 'axios';
 
-function App() {
-  const [date, setDate] = React.useState<Dayjs | null>(null);
-  const [time, setTime] = React.useState<string | null>(null);
-  const [op, setOp] = React.useState<string>('0');
-  const [newDate, setNewDate] = React.useState<string | null>(null);
-  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+interface RowData {
+  text: string;
+  type: string;
+}
 
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const controller = new AbortController();
+function App() {
+  const [date, setDate] = React.useState<Dayjs | null>(null)
+  const [time, setTime] = React.useState<string | null>(null)
+  const [op, setOp] = React.useState<string>('0')
+
+  const [loading, setLoading] = React.useState<boolean>(false)
+  const controller = new AbortController()
+
+  const [consoleRows, setConsoleRows] = React.useState<RowData[]>([])
 
   const handlerSend = async () => {
     setLoading(true)
     try {
+      console.log(consoleRows)
       // Validation
       if (!date){
-        setErrorMsg("O Campo 'Data inicial' é obrigatório!")
+        setConsoleRows([{text: ">> O Campo 'Data inicial' é obrigatório!", type: 'e'}, ...consoleRows])
         setLoading(false)
         return
       }
       if (op === '0'){
-        setErrorMsg("O Campo 'operador' não foi selecionado!")
+        setConsoleRows([{text: ">> O Campo 'operador' não foi selecionado!", type: 'e'}, ...consoleRows])
         setLoading(false)
         return
       }
       if (!time){
-        setErrorMsg("O Campo 'Minutos' é obrigatório!")
+        setConsoleRows([{text: ">> O Campo 'Minutos' é obrigatório!", type: 'e'}, ...consoleRows])
         setLoading(false)
         return
       }
-      setNewDate(null)
-      setErrorMsg(null)
       let operator;
       if (op === '1')
         operator = '+'
@@ -49,12 +53,12 @@ function App() {
         operator = '-'
       const dateToSend = date?.format('DD/MM/YYYY HH:mm');
       const response = await api.post('date-manager', { 'dateValue': dateToSend, 'op': operator, 'time': parseInt(time ?? '0')}, { headers: { 'Content-Type': 'application/json'}, signal: controller.signal })
-      setNewDate(response.data.dateValue)
+      setConsoleRows([{ text: `>> ${response.data.dateValue}`, type: 'i' }, ...consoleRows])
     } catch (error) {
       const errors = error as Error | AxiosError
       if (axios.isAxiosError(errors))
-          setErrorMsg(errors.response?.data.message)
-      setErrorMsg(errors.message)
+          setConsoleRows([{ text: `>> ${errors.response?.data.message}`, type: 'e' }, ...consoleRows])
+      setConsoleRows([{ text: `>> ${errors.message}`, type: 'e' }, ...consoleRows])
     }
     setLoading(false)
   }
@@ -136,7 +140,27 @@ function App() {
           >
             Enviar {loading && <TailSpin width={15} height={15} style={{margin: '0 4px'}} />}
           </button>
-          <div id='infoLabel'>{newDate ? (<p>{`Data calculada: ${newDate}`}</p>) : (errorMsg ? <p className='error'>{errorMsg}</p> : null)}</div>
+          {/* <div id='infoLabel'>{newDate ? (<p>{`Data calculada: ${newDate}`}</p>) : (errorMsg ? <p className='error'>{errorMsg}</p> : null)}</div> */}
+        </div>
+        <div className='history'>
+          <h3 style={{textAlign: 'left'}}>Console</h3>
+          <TableContainer sx={{height: '100%'}} component={Paper}>
+            <Table sx={{backgroundColor: '#424242'}}>
+              <TableBody>
+                {consoleRows.map((row:RowData, index: number) => (
+                  <TableRow
+                    key={index}
+                    sx={{ '& td, & th': { border: 0, padding: '6px' } }}
+                  >
+                    {row.type === 'e' ? 
+                      <TableCell component="th" sx={{color: 'red'}}>{row.text}</TableCell> :
+                      <TableCell component="th" sx={{color: 'white'}}>{row.text}</TableCell> 
+                    }
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </div>
       </div>
       <p className="foo">

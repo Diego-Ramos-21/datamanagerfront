@@ -21,7 +21,8 @@
 }
 
 .card {
-  padding: 2em;
+  height: 30vh;
+  padding: 2em 2em 0em 2em;
 }
 
 .send {
@@ -42,4 +43,8 @@
 
 .error {
   color: red;
+}
+
+.history {
+  height: 100%;
 }
