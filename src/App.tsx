@@ -142,8 +142,8 @@ function App() {
         </div>
         <div className='history'>
           <h3 style={{textAlign: 'left'}}>Console</h3>
-          <TableContainer sx={{height: '100%'}} component={Paper}>
-            <Table sx={{backgroundColor: '#424242'}}>
+          <TableContainer sx={{height: '100%', backgroundColor: '#424242'}} component={Paper}>
+            <Table>
               <TableBody>
                 {consoleRows.map((row:RowData, index: number) => (
                   <TableRow
